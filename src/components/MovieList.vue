@@ -11,9 +11,20 @@
 				@input="searchMovies"
 			/>
 		</div>
+
+		<div class="my-4 flex flex-col space-x-1 items-center justify-center">
+			<label for="genreFilter">Filter by genre:</label>
+			<select id="genreFilter" class="border p-2" v-model="selectedGenre">
+				<option value="">All genres</option>
+				<option v-for="genre in genres" :key="genre" :value="genre">
+					{{ genre }}
+				</option>
+			</select>
+		</div>
+
 		<ul v-if="hasMovies">
 			<li v-for="movie in movies" :key="movie.imdbID">
-				{{ movie.Title }} ({{ movie.Year }})
+				{{ movie.Title }} ({{ movie.Year }}) - {{ movie.Genre }}
 			</li>
 		</ul>
 		<p v-else>No movies found.</p>
@@ -21,19 +32,26 @@
 </template>
 
 <script setup>
-	import axios from 'axios'
-	import { ref, computed } from 'vue'
+	import { useMovies } from '/src/composables/useMovies'
+	import { ref, computed, watch } from 'vue'
 
-	const movies = ref([])
-	const searchTerm = ref('')
+	const { movies, searchTerm, genres, searchMovies } = useMovies()
+	const selectedGenre = ref('')
 
 	const hasMovies = computed(() => movies.value?.length > 0)
 
-	const searchMovies = async () => {
-		const apiKey = import.meta.env.VITE_OMD_API
-		const response = await axios.get(
-			`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchTerm.value}`
+	const filterByGenre = () => {
+		// console.log('selectedGenre', selectedGenre.value)
+		if (!selectedGenre.value) {
+			return movies.value
+		}
+
+		console.log('movies.value', movies.value)
+
+		return movies.value.filter(movie =>
+			movie?.Genre?.includes(selectedGenre.value)
 		)
-		movies.value = response.data.Search
 	}
+
+	watch(selectedGenre, filterByGenre)
 </script>
