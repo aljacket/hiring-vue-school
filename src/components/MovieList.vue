@@ -14,11 +14,30 @@
 
 		<div class="my-4 flex flex-col space-x-1 items-center justify-center">
 			<label for="genreFilter">Filter by genre:</label>
-			<select id="genreFilter" class="border p-2" v-model="selectedGenre">
+			<select
+				id="genreFilter"
+				class="border border-gray-300 rounded-md px-2 py-1"
+				v-model="selectedGenre"
+			>
 				<option value="">All genres</option>
 				<option v-for="genre in genres" :key="genre" :value="genre">
 					{{ genre }}
 				</option>
+			</select>
+		</div>
+
+		<div class="my-4 flex flex-col space-x-1 items-center justify-center">
+			<label for="sort">Sort by:</label>
+			<select
+				id="sort"
+				class="border border-gray-300 rounded-md px-2 py-1"
+				v-model="sortBy"
+				@change="sortMovies"
+			>
+				<option value="">None</option>
+				<option value="year">Release year</option>
+				<option value="rating">IMDb rating</option>
+				<option value="title">Title</option>
 			</select>
 		</div>
 
@@ -35,13 +54,13 @@
 	import { useMovies } from '/src/composables/useMovies'
 	import { ref, computed, watch } from 'vue'
 
-	const { movies, searchTerm, genres, searchMovies } = useMovies()
+	const { movies, searchTerm, genres, searchMovies, sortBy, sortMovies } =
+		useMovies()
 	const selectedGenre = ref('')
 
 	const hasMovies = computed(() => movies.value?.length > 0)
 
 	const filterByGenre = () => {
-		// console.log('selectedGenre', selectedGenre.value)
 		if (!selectedGenre.value) {
 			return movies.value
 		}
@@ -54,4 +73,5 @@
 	}
 
 	watch(selectedGenre, filterByGenre)
+	watch(sortBy, sortMovies)
 </script>

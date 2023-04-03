@@ -26,6 +26,8 @@ export const useMovies = () => {
 		'western',
 	]
 
+	const sortBy = ref('')
+
 	const searchMovies = async () => {
 		const apiKey = import.meta.env.VITE_OMD_API
 		const response = await axios.get(
@@ -34,5 +36,15 @@ export const useMovies = () => {
 		movies.value = response.data.Search
 	}
 
-	return { searchTerm, movies, genres, searchMovies }
+	const sortMovies = () => {
+		if (sortBy.value === 'year') {
+			movies.value.sort((a, b) => b.Year - a.Year)
+		} else if (sortBy.value === 'rating') {
+			movies.value.sort((a, b) => b.imdbRating - a.imdbRating)
+		} else if (sortBy.value === 'title') {
+			movies.value.sort((a, b) => a.Title.localeCompare(b.Title))
+		}
+	}
+
+	return { searchTerm, movies, genres, searchMovies, sortBy, sortMovies }
 }
