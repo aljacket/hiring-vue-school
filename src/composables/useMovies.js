@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
+import { useRatings } from './useRatings'
 
 export const useMovies = () => {
 	const searchTerm = ref('')
@@ -25,13 +26,14 @@ export const useMovies = () => {
 		'war',
 		'western',
 	]
+	const { getRating, setRating } = useRatings()
 
 	const sortBy = ref('')
 
 	const searchMovies = async () => {
 		const apiKey = import.meta.env.VITE_OMD_API
 		const response = await axios.get(
-			`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchTerm.value}`
+			`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchTerm.value}&plot=full`
 		)
 		movies.value = response.data.Search
 	}
@@ -46,5 +48,30 @@ export const useMovies = () => {
 		}
 	}
 
-	return { searchTerm, movies, genres, searchMovies, sortBy, sortMovies }
+	const getMovieDetails = async imdbID => {
+		const apiKey = import.meta.env.VITE_OMD_API
+		const response = await axios.get(
+			`https://www.omdbapi.com/?apikey=${apiKey}&i=${imdbID}&plot=full`
+		)
+		const movie = response.data
+		movie.rating = getRating(imdbID)
+		return movie
+	}
+
+	const updateRating = (imdbID, rating) => {
+		setRating(imdbID, rating)
+		const movie = movies.value.find(movie => movie.imdbID === imdbID)
+		movie.rating = rating
+	}
+
+	return {
+		searchTerm,
+		movies,
+		genres,
+		sortBy,
+		searchMovies,
+		sortMovies,
+		getMovieDetails,
+		updateRating,
+	}
 }
