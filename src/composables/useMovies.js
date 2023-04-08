@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRatings } from './useRatings'
+import { useReviews } from './useReviews'
 
 export const useMovies = () => {
 	const searchTerm = ref('')
@@ -27,6 +28,7 @@ export const useMovies = () => {
 		'western',
 	]
 	const { getRating, setRating } = useRatings()
+	const { getReview, setReview } = useReviews()
 
 	const sortBy = ref('')
 
@@ -55,6 +57,7 @@ export const useMovies = () => {
 		)
 		const movie = response.data
 		movie.rating = getRating(imdbID)
+		movie.review = getReview(imdbID)
 		return movie
 	}
 
@@ -62,6 +65,12 @@ export const useMovies = () => {
 		setRating(imdbID, rating)
 		const movie = movies.value.find(movie => movie.imdbID === imdbID)
 		movie.rating = rating
+	}
+
+	const updateReview = (imdbID, review) => {
+		setReview(imdbID, review)
+		const movie = movies.value.find(movie => movie.imdbID === imdbID)
+		movie.review = review
 	}
 
 	return {
@@ -73,5 +82,6 @@ export const useMovies = () => {
 		sortMovies,
 		getMovieDetails,
 		updateRating,
+		updateReview,
 	}
 }
