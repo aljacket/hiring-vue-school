@@ -1,5 +1,7 @@
 <template>
-	<MovieList />
+	<div class="h-full w-full">
+		<MovieList />
+	</div>
 </template>
 
 <script setup>
