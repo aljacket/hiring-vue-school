@@ -40,7 +40,7 @@
 				>
 					<option value="">None</option>
 					<option value="year">Release year</option>
-					<option value="rating">IMDb rating</option>
+					<option value="rating">Rating</option>
 					<option value="title">Title</option>
 				</select>
 			</div>
@@ -59,7 +59,7 @@
 			<!-- get movies from list -->
 			<div>
 				<select
-					class="w-full p-1"
+					class="w-full border border-gray-300 rounded-md px-2 py-1"
 					@change="getMoviesFromList(movieByList)"
 					v-model="movieByList"
 				>
@@ -228,6 +228,7 @@
 
 	const getMoviesFromList = list => {
 		moviesMatchList.value = []
+		movies.value = []
 
 		const object = getAllLists()
 

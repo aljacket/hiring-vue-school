@@ -37,16 +37,22 @@ export const useMovies = () => {
 	const searchMovies = async () => {
 		const apiKey = import.meta.env.VITE_OMD_API
 		const response = await axios.get(
-			`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchTerm.value}&plot=full`
+			`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchTerm.value}&r=json`
 		)
 		movies.value = response.data.Search
+		movies.value = movies.value?.map(movie => {
+			movie.rating = getRating(movie.imdbID)
+			return movie
+		})
 	}
 
 	const sortMovies = () => {
 		if (sortBy.value === 'year') {
 			movies.value.sort((a, b) => b.Year - a.Year)
 		} else if (sortBy.value === 'rating') {
-			movies.value.sort((a, b) => b.imdbRating - a.imdbRating)
+			movies.value.sort((a, b) => {
+				return b.rating - a.rating
+			})
 		} else if (sortBy.value === 'title') {
 			movies.value.sort((a, b) => a.Title.localeCompare(b.Title))
 		}
