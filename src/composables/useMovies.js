@@ -7,27 +7,8 @@ import { useLists } from './useLists'
 export const useMovies = () => {
 	const searchTerm = ref('')
 	const movies = ref([])
-	const genres = [
-		'action',
-		'adventure',
-		'animation',
-		'comedy',
-		'crime',
-		'documentary',
-		'drama',
-		'family',
-		'fantasy',
-		'history',
-		'horror',
-		'music',
-		'mystery',
-		'romance',
-		'science fiction',
-		'tv movie',
-		'thriller',
-		'war',
-		'western',
-	]
+	const genres = ref([])
+
 	const { getRating, setRating } = useRatings()
 	const { getReview, setReview } = useReviews()
 	const { getList, setList, setMovieList } = useLists()
@@ -40,10 +21,42 @@ export const useMovies = () => {
 			`https://www.omdbapi.com/?apikey=${apiKey}&s=${searchTerm.value}&r=json`
 		)
 		movies.value = response.data.Search
-		movies.value = movies.value?.map(movie => {
-			movie.rating = getRating(movie.imdbID)
-			return movie
+
+		const requests = movies.value?.map(async m => {
+			return await getMovieDetails(m.imdbID)
 		})
+
+		if (requests) {
+			const responses = await Promise.all(requests)
+
+			movies.value = responses
+		}
+	}
+
+	const getGenres = async () => {
+		const apiKey = import.meta.env.VITE_OMD_API
+
+		let allGenres = []
+
+		try {
+			const requests = movies.value?.flatMap(movie => {
+				return axios.get(
+					`https://www.omdbapi.com/?apikey=${apiKey}&i=${movie.imdbID}`
+				)
+			})
+
+			if (requests) {
+				const responses = await Promise.all(requests)
+
+				allGenres = responses?.map(response => {
+					return response.data.Genre.split(', ')
+				})
+			}
+		} catch (error) {
+			console.log('error getting genres', error)
+		}
+
+		genres.value = Array.from(new Set(allGenres?.flat()))
 	}
 
 	const sortMovies = () => {
@@ -99,6 +112,7 @@ export const useMovies = () => {
 		genres,
 		sortBy,
 		searchMovies,
+		getGenres,
 		sortMovies,
 		getMovieDetails,
 		updateRating,

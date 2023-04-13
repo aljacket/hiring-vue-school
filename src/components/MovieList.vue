@@ -79,7 +79,7 @@
 			</div>
 
 			<ul v-if="hasMovies">
-				<li v-for="movie in movies" :key="movie.imdbID">
+				<li v-for="movie in filterByGenre" :key="movie.imdbID">
 					{{ movie.Title }} ({{ movie.Year }}) - {{ movie.Genre }}
 					<button class="bg-red-400" @click="getDetails(movie.imdbID)">
 						more detail
@@ -159,7 +159,7 @@
 	import NavBar from './NavBar.vue'
 
 	import { useMovies } from '/src/composables/useMovies'
-	import { ref, computed, watch } from 'vue'
+	import { ref, computed, watch, watchEffect } from 'vue'
 
 	const {
 		movies,
@@ -173,6 +173,7 @@
 		updateReview,
 		getAllLists,
 		addMovieToList,
+		getGenres,
 	} = useMovies()
 
 	const selectedGenre = ref('')
@@ -186,24 +187,19 @@
 
 	const hasMovies = computed(() => movies.value?.length > 0)
 
-	const filterByGenre = () => {
-		if (!selectedGenre.value) {
+	const filterByGenre = computed(() => {
+		// console.log('filterByGenre: ', selectedGenre.value)
+		if (selectedGenre.value === '') {
 			return movies.value
 		}
 
-		return movies.value.filter(movie =>
-			movie?.Genre?.includes(selectedGenre.value)
-		)
-	}
+		// console.log(
+		// 	'movie filtered by genre: ',
+		// 	movies.value.filter(m => m.Genre.includes(selectedGenre.value))
+		// )
 
-	const getDetails = async id => {
-		movieDetail.value = await getMovieDetails(id)
-	}
-
-	const updateRate = async (id, rating) => {
-		await updateRating(id, rating)
-		await getDetails(id)
-	}
+		return movies.value.filter(m => m.Genre.includes(selectedGenre.value))
+	})
 
 	const allLists = computed(() => {
 		const object = getAllLists()
@@ -216,6 +212,15 @@
 		return lists
 	})
 
+	const getDetails = async id => {
+		movieDetail.value = await getMovieDetails(id)
+	}
+
+	const updateRate = async (id, rating) => {
+		await updateRating(id, rating)
+		await getDetails(id)
+	}
+
 	const updateRew = async (id, review) => {
 		await updateReview(id, review)
 		await getDetails(id)
@@ -227,25 +232,32 @@
 	}
 
 	const getMoviesFromList = list => {
-		moviesMatchList.value = []
+		if (list === '') {
+			moviesMatchList.value = []
+		}
+
 		movies.value = []
+		searchTerm.value = ''
 
 		const object = getAllLists()
 
 		const arrayMovies = object[list]
-			.map(list => {
+			?.map(list => {
 				if (typeof list === 'string') {
 					return list
 				}
 			})
 			.filter(l => l !== undefined)
 
-		arrayMovies.forEach(async m => {
+		arrayMovies?.forEach(async m => {
 			const movie = await getMovieDetails(m)
 			moviesMatchList.value.push(movie)
 		})
 	}
 
-	watch(selectedGenre, filterByGenre)
-	watch(sortBy, sortMovies)
+	watch(movies, async () => {
+		await getGenres()
+	})
+
+	watchEffect(sortBy, sortMovies)
 </script>
