@@ -243,10 +243,7 @@
 	}
 
 	const getMoviesFromList = list => {
-		if (list === '') {
-			moviesMatchList.value = []
-		}
-
+		moviesMatchList.value = []
 		movies.value = []
 		searchTerm.value = ''
 
@@ -259,6 +256,8 @@
 				}
 			})
 			.filter(l => l !== undefined)
+
+		console.log('arrayMovies', arrayMovies)
 
 		arrayMovies?.forEach(async m => {
 			const movie = await getMovieDetails(m)
