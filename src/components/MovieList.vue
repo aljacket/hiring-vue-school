@@ -71,22 +71,39 @@
 				<div v-if="moviesMatchList">
 					<li v-for="movieList in moviesMatchList" :key="movieList.imdbID">
 						{{ movieList.Title }}
-						<button class="bg-red-400" @click="getDetails(movieList.imdbID)">
-							more detail
-						</button>
 					</li>
 				</div>
 			</div>
 
 			<ul v-if="hasMovies">
-				<li v-for="movie in filterByGenre" :key="movie.imdbID">
-					{{ movie.Title }} ({{ movie.Year }}) - {{ movie.Genre }}
-					<button class="bg-red-400" @click="getDetails(movie.imdbID)">
-						more detail
-					</button>
-				</li>
+				<table class="table-auto">
+					<thead>
+						<tr>
+							<th class="border-r-2">Title</th>
+							<th class="border-r-2">Year</th>
+							<th class="border-r-2">Genre</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="movie in filterByGenre" :key="movie.imdbID">
+							<td class="border-r-2">{{ movie.Title }}</td>
+							<td class="border-r-2">{{ movie.Year }}</td>
+							<td class="border-r-2">{{ movie.Genre }}</td>
+							<td class="flex justify-center">
+								<button
+									class="bg-red-300 rounded-xl p-2 text-white"
+									@click="getDetails(movie.imdbID)"
+								>
+									go
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</ul>
 		</div>
+
 		<div class="w-full md:w-1/2 p-4">
 			<div
 				v-if="movieDetail"
@@ -188,15 +205,9 @@
 	const hasMovies = computed(() => movies.value?.length > 0)
 
 	const filterByGenre = computed(() => {
-		// console.log('filterByGenre: ', selectedGenre.value)
 		if (selectedGenre.value === '') {
 			return movies.value
 		}
-
-		// console.log(
-		// 	'movie filtered by genre: ',
-		// 	movies.value.filter(m => m.Genre.includes(selectedGenre.value))
-		// )
 
 		return movies.value.filter(m => m.Genre.includes(selectedGenre.value))
 	})
