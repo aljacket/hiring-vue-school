@@ -31,17 +31,17 @@
 						>
 							<DialogTitle
 								as="h3"
-								class="text-lg font-medium leading-6 text-gray-900"
+								class="text-lg my-2 font-medium leading-6 text-gray-900"
 							>
 								Create List
 							</DialogTitle>
 
-							<input type="text" v-model="listName" />
+							<input type="text" class="w-full" v-model="listName" />
 
 							<div class="mt-4">
 								<button
 									type="button"
-									class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+									class="w-full bg-green-300 text-white p-2 rounded-lg"
 									@click="create"
 								>
 									Create
